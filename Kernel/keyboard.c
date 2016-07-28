@@ -7,7 +7,7 @@
 #define KEYBOARD_DATA_PORT		0x60
 #define KEYBOARD_STATUS_PORT	0x64
 
-#define BUFFER_SIZE 64
+#define BUFFER_SIZE 4
 
 static void key_pressed(char keycode);
 static int isalpha(char keycode);
@@ -16,6 +16,7 @@ void ncPrintChar(char);
 static unsigned char kb_buffer[BUFFER_SIZE] = { EMPTY };
 static int write_pos = 0;
 static int read_pos = 0;
+
 
 static int shift_on = 0;
 static int caps_lock_on = 0;
@@ -51,7 +52,6 @@ void key_pressed(char keycode) {
 	}
 
 	if (!(keycode & KEY_RELEASED)) { // escribis cuando este mantenida la tecla
-		//putnumber(keycode, RED);
 
 		int shift = (isalpha(keycode) && caps_lock_on);
 
@@ -61,6 +61,10 @@ void key_pressed(char keycode) {
 
 		unsigned char ascii = keyboard_map[shift][(int)keycode];
 		ncPrintChar(ascii);
+		kb_buffer[write_pos++]=ascii;
+		if (write_pos==BUFFER_SIZE)
+			write_pos=0;
+		
 	}	
 }
 
